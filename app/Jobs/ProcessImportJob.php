@@ -23,12 +23,10 @@ class ProcessImportJob implements ShouldQueue
 
     private array $offers;
 
-    public function __construct(
-        private Import $import,
-        array $offers
-    ) {
-        $this->offers = $offers;
-    }
+     public function __construct(
+        public Import $import,
+        public array $offers
+    ) {}
 
     public function handle(): void
     {
