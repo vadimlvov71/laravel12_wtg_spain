@@ -21,8 +21,6 @@ class ProcessImportJob implements ShouldQueue
     public $backoff = [60, 300, 600]; // Интервалы повторов (сек)
     public $timeout = 300; // Timeout 5 минут
 
-    private array $offers;
-
      public function __construct(
         public Import $import,
         public array $offers

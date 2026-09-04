@@ -19,6 +19,25 @@ class ImportController extends Controller
         // 1. Получаем поставщика
         $supplier = Supplier::where('code', $request->supplier)->firstOrFail();
 
+        if (!$supplier) {
+            Log::warning('Supplier not found', ['supplier_code' => $request->supplier]);
+            
+            // Логируем ошибку
+           
+            return response()->json([
+                'error' => "Поставщик '{$request->supplier}' не найден",
+                'error_code' => 'SUPPLIER_NOT_FOUND'
+            ], 404);
+        }
+        if ($supplier->is_blocked) {
+            
+            // Логируем ошибку
+            return response()->json([
+                'error' => "Поставщик заблокирован",
+                'reason' => $supplier->blocked_reason,
+                'error_code' => 'SUPPLIER_BLOCKED'
+            ], 403);
+        }
         // 2. Проверяем, не был ли уже обработан этот импорт
         $existingImport = Import::where('supplier_id', $supplier->id)
             ->where('external_import_id', $request->external_import_id)
