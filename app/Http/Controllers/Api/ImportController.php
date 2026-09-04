@@ -26,6 +26,7 @@ class ImportController extends Controller
 
         if ($existingImport) {
             // Импорт уже существует
+            Log::info('Import exists');
             return response()->json([
                 'data' => [
                     'id' => $existingImport->id,
