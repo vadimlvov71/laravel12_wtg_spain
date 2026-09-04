@@ -8,17 +8,14 @@ use App\Jobs\ProcessImportJob;
 use App\Models\Supplier;
 use App\Models\Import;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ImportController extends Controller
 {
     public function store(StoreImportRequest $request): JsonResponse
     {
-        /*return response()->json([
-            'data' => [
-                'id' => 'test',
-                'status' => '111'
-            ]
-        ], 200);*/
+        Log::info('Import request received', ['supplier' => $request->supplier]);
+
         // 1. Получаем поставщика
         $supplier = Supplier::where('code', $request->supplier)->firstOrFail();
 
@@ -45,10 +42,10 @@ class ImportController extends Controller
             'status' => 'pending',
             'offers_count' => count($request->offers)
         ]);
-
+        Log::info('Import created', ['id' => $import->id]);
         // 4. Отправляем обработку в очередь
         ProcessImportJob::dispatch($import, $request->offers);
-
+        Log::info('Job dispatched', ['import_id' => $import->id]);
         // 5. Возвращаем 202 Accepted
         return response()->json([
             'data' => [

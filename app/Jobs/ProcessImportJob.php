@@ -32,6 +32,7 @@ class ProcessImportJob implements ShouldQueue
 
     public function handle(): void
     {
+        Log::info("ProcessImportJob started");
         try {
             // Обновляем статус на processing
             $this->import->update(['status' => 'processing']);
