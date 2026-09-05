@@ -9,34 +9,30 @@ use App\Models\Supplier;
 use App\Models\Import;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use App\Services\ImportService;
 
 class ImportController extends Controller
 {
+     public function __construct(private ImportService $importService)
+    {
+    }
+
     public function store(StoreImportRequest $request): JsonResponse
     {
         Log::info('Import request received', ['supplier' => $request->supplier]);
-
+       
+        Log::info('ImportService initialized');
         // 1. Получаем поставщика
         $supplier = Supplier::where('code', $request->supplier)->firstOrFail();
 
         if (!$supplier) {
-            Log::warning('Supplier not found', ['supplier_code' => $request->supplier]);
-            
-            // Логируем ошибку
-           
-            return response()->json([
-                'error' => "Поставщик '{$request->supplier}' не найден",
-                'error_code' => 'SUPPLIER_NOT_FOUND'
-            ], 404);
+            //TO DO
+            //we can create handle with insert in database
+            $this->importService->process($request->all(), $request->ip());
         }
         if ($supplier->is_blocked) {
-            
-            // Логируем ошибку
-            return response()->json([
-                'error' => "Поставщик заблокирован",
-                'reason' => $supplier->blocked_reason,
-                'error_code' => 'SUPPLIER_BLOCKED'
-            ], 403);
+            //TO DO
+            //we can create handle with insert in database
         }
         // 2. Проверяем, не был ли уже обработан этот импорт
         $existingImport = Import::where('supplier_id', $supplier->id)
