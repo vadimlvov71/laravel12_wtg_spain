@@ -17,7 +17,7 @@
 3. run  "php artisan queue:work --verbose"
 4. run functional tests:
 * ```sh
-      vendor/bin/phpunit tests
+      php artisan test tests/Feature/Api/ImportControllerTest.php
 #### result:
 * ![изображение](https://github.com/vadimlvov71/laravel12_wtg_spain/public/images/spain_test.png)
 
