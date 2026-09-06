@@ -18,11 +18,12 @@
 4. run functional tests:
 * ```sh
       vendor/bin/phpunit tests
+#### result:
+* ![изображение](https://github.com/vadimlvov71/laravel12_wtg_spain/public/images/spain_test.png)
 
+#### Механизм захисту від подвійного бронювання | Double Booking Prevention Mechanism
 
-## Механизм захисту від подвійного бронювання | Double Booking Prevention Mechanism
-
-### 🔒 Проблема | Problem
+#### 🔒 Проблема | Problem
 
 При одночасних запитах від двох клієнтів на останню доступну одиницю пропозиції, існує ризик, що обидва замовлення будуть прийняті, хоча доступна лише одна одиниця.
 
