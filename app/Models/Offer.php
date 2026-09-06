@@ -25,7 +25,10 @@ class Offer extends Model
         'check_out' => 'date',
         'expires_at' => 'datetime',
     ];
-
+    public function getRouteKeyName(): string
+    {
+        return 'external_id';
+    }
     public function import()
     {
         return $this->belongsTo(Import::class);
@@ -40,4 +43,8 @@ class Offer extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+}
 }
