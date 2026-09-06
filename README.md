@@ -19,7 +19,7 @@
 * ```sh
       php artisan test tests/Feature/Api/ImportControllerTest.php
 #### result:
-* ![изображение](https://github.com/vadimlvov71/laravel12_wtg_spain/public/images/spain_test.png)
+* ![изображение](https://github.com/vadimlvov71/laravel12_wtg_spain/blob/main/public/images/spain_test.png)
 
 #### Механизм захисту від подвійного бронювання | Double Booking Prevention Mechanism
 
