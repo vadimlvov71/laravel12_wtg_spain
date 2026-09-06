@@ -1,9 +1,6 @@
 ####  laravel12_wtg_spain
-####  Currency Commission Calculation
 ##### About The Project 
 * test task for WTG_Spain
-* ![изображение](https://github.com/vadimlvov71/currency_commission/assets/57807117/43caa3ae-5475-45ee-aed0-e6aa26c45cda)
-
 
 ##### Prerequisites
 * php 8.2
@@ -16,17 +13,14 @@
 1. Clone the repo
    ```sh
    git clone git@github.com:vadimlvov71/laravel12_wtg_spain.git
-2. run  "php app.php input.php"
-3. run functional tests:
+2. run  "usual command: composer install, migrations, seeders"
+3. run  "php artisan queue:work --verbose"
+4. run functional tests:
 * ```sh
       vendor/bin/phpunit tests
 
 
-
-##### run command:
-php artisan queue:work --verbose
-
-## Механизм защиты від подвійного бронювання | Double Booking Prevention Mechanism
+## Механизм захисту від подвійного бронювання | Double Booking Prevention Mechanism
 
 ### 🔒 Проблема | Problem
 
