@@ -10,6 +10,7 @@ use App\Models\Import;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use App\Services\ImportService;
+use App\Http\Resources\ImportResource;
 
 class ImportController extends Controller
 {
@@ -42,12 +43,12 @@ class ImportController extends Controller
         if ($existingImport) {
             // Импорт уже существует
             Log::info('Import exists');
-            return response()->json([
-                'data' => [
-                    'id' => $existingImport->id,
-                    'status' => $existingImport->status
-                ]
-            ], 202);
+            return (new ImportResource($existingImport))
+            ->additional([
+                'message' => 'Import already exists. Re-import is not allowed.',
+            ])
+            ->response()
+            ->setStatusCode(409);
         }
 
         // 3. Создаем новый импорт со статусом pending
@@ -63,28 +64,16 @@ class ImportController extends Controller
         ProcessImportJob::dispatch($import, $request->offers);
         Log::info('Job dispatched', ['import_id' => $import->id]);
         // 5. Возвращаем 202 Accepted
-        return response()->json([
-            'data' => [
-                'id' => $import->id,
-                'status' => $import->status
-            ]
-        ], 202);
+        return (new ImportResource($import))
+            ->response()
+            ->setStatusCode(202);
     }
 
     /**
      * Получить статус импорта
      */
-    public function show(Import $import): JsonResponse
+    public function show(Import $import): ImportResource
     {
-        return response()->json([
-            'data' => [
-                'id' => $import->id,
-                'status' => $import->status,
-                'offers_count' => $import->offers_count,
-                'error' => $import->error_message,
-                'created_at' => $import->created_at,
-                'updated_at' => $import->updated_at,
-            ]
-        ]);
+        return new ImportResource($import);
     }
 }
