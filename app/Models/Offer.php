@@ -24,6 +24,8 @@ class Offer extends Model
         'check_in' => 'date',
         'check_out' => 'date',
         'expires_at' => 'datetime',
+        'payload' => 'array',
+        'source_sent_at' => 'datetime',
     ];
     public function getRouteKeyName(): string
     {

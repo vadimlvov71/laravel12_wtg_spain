@@ -25,31 +25,43 @@ class PropertySearchService
         // 4. Сортирует по цене
         // 5. Применяет пагинацию на уровне БД
 
-        $query = DB::table('offers')
-            ->select(
-                'properties.id as property_id',
-                'properties.code',
-                'properties.name',
-                'properties.city',
-                'offers.id as offer_id',
-                'suppliers.code as supplier_code',
-                'offers.price',
-                'offers.currency',
-                'offers.available_units',
-                'offers.expires_at'
-            )
-            ->join('properties', 'offers.property_id', '=', 'properties.id')
-            ->join('suppliers', 'offers.supplier_id', '=', 'suppliers.id')
-            ->whereIn('offers.id', function ($subQuery) use ($checkIn, $checkOut, $guests, $now) {
-                // Подзапрос: для каждой property берём offer с минимальной ценой
-                $subQuery->selectRaw('MIN(id) OVER (PARTITION BY property_id ORDER BY price ASC)')
-                    ->from('offers')
-                    ->where('check_in', '<=', $checkIn)
-                    ->where('check_out', '>=', $checkOut)
-                    ->where('max_guests', '>=', $guests)
-                    ->where('available_units', '>', 0)
-                    ->where('expires_at', '>', $now);
-            });
+        $query = DB::query()
+        ->fromSub(function ($subQuery) use ($checkIn, $checkOut, $guests, $now) {
+            $subQuery->from('offers')
+                ->selectRaw('
+                    offers.id,
+                    offers.property_id,
+                    offers.supplier_id,
+                    offers.price,
+                    offers.currency,
+                    offers.available_units,
+                    offers.expires_at,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY offers.property_id
+                        ORDER BY offers.price ASC, offers.id ASC
+                    ) as rn
+                ')
+                ->where('offers.check_in', '<=', $checkIn)
+                ->where('offers.check_out', '>=', $checkOut)
+                ->where('offers.max_guests', '>=', $guests)
+                ->where('offers.available_units', '>', 0)
+                ->where('offers.expires_at', '>', $now);
+        }, 'ranked_offers')
+        ->join('properties', 'ranked_offers.property_id', '=', 'properties.id')
+        ->join('suppliers', 'ranked_offers.supplier_id', '=', 'suppliers.id')
+        ->where('ranked_offers.rn', 1)
+        ->select(
+            'properties.id as property_id',
+            'properties.code',
+            'properties.name',
+            'properties.city',
+            'ranked_offers.id as offer_id',
+            'suppliers.code as supplier_code',
+            'ranked_offers.price',
+            'ranked_offers.currency',
+            'ranked_offers.available_units',
+            'ranked_offers.expires_at'
+        );
 
         // Фильтр по городу
         if (!empty($filters['city'])) {
@@ -57,7 +69,7 @@ class PropertySearchService
         }
 
         // Сортируем по цене (на уровне БД)
-        $query->orderBy('offers.price', 'asc');
+        $query->orderBy('price', 'asc');
 
         // Пагинация на уровне БД!
         return $query->paginate($perPage);
