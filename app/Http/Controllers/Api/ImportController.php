@@ -57,7 +57,7 @@ class ImportController extends Controller
             'external_import_id' => $request->external_import_id,
             'sent_at' => $request->sent_at,
             'status' => 'pending',
-            'offers_count' => count($request->offers)
+            'total_offers' => count($request->offers)
         ]);
         Log::info('Import created', ['id' => $import->id]);
         // 4. Отправляем обработку в очередь

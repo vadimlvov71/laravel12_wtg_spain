@@ -25,7 +25,7 @@ class ImportFactory extends Factory
             'external_import_id' => $this->faker->unique()->word() . '-' . $this->faker->randomNumber(5),
             'sent_at' => $this->faker->dateTime(),
             'status' => 'pending',
-            'offers_count' => $this->faker->numberBetween(1, 50),
+            'total_offers' => $this->faker->numberBetween(1, 50),
             'error_message' => null,
            // 'ip_address' => $this->faker->ipv4(),
         ];

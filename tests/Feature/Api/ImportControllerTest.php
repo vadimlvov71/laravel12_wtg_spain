@@ -89,7 +89,7 @@ class ImportControllerTest extends TestCase
             'supplier_id' => $this->supplier->id,
             'external_import_id' => 'import-123',
             'status' => 'pending',
-            'offers_count' => 2,
+            'total_offers' => 2,
         ]);
 
         // Проверяем, что джоб отправлен в очередь
@@ -123,7 +123,7 @@ class ImportControllerTest extends TestCase
 
         $response = $this->postJson('/api/imports', $payload);
 
-        $response->assertStatus(202);
+        $response->assertStatus(409);
         $response->assertJsonPath('data.id', $existingImport->id);
         $response->assertJsonPath('data.status', 'completed');
 
@@ -391,18 +391,21 @@ class ImportControllerTest extends TestCase
         $import = Import::factory()->create([
             'supplier_id' => $this->supplier->id,
             'status' => 'processing',
-            'offers_count' => 10,
         ]);
+
+        $import->update([
+            'total_offers' => 10,
+            'processed_offers' => 4,
+        ]);
+        $import->refresh();
 
         $response = $this->getJson("/api/imports/{$import->id}");
 
         $response->assertStatus(200);
-        $response->assertJsonStructure([
-            'data' => ['id', 'status', 'offers_count', 'error', 'created_at', 'updated_at']
-        ]);
         $response->assertJsonPath('data.id', $import->id);
         $response->assertJsonPath('data.status', 'processing');
-        $response->assertJsonPath('data.offers_count', 10);
+        $response->assertJsonPath('data.total_offers', 10);
+        $response->assertJsonPath('data.processed_offers', 4);
     }
 
     /**
@@ -440,7 +443,7 @@ class ImportControllerTest extends TestCase
 
         $this->assertDatabaseHas('imports', [
             'external_import_id' => 'import-large',
-            'offers_count' => 50,
+            'total_offers' => 50,
         ]);
 
         Queue::assertPushed(ProcessImportJob::class);

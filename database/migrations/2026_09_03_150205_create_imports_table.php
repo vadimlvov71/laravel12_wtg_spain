@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('external_import_id');
             $table->timestamp('sent_at');
             $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
-            $table->integer('offers_count')->default(0);
+            $table->integer('total_offers')->default(0);
             $table->text('error_message')->nullable();
             $table->timestamps();
             

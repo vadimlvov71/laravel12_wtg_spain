@@ -14,7 +14,8 @@ class Import extends Model
         'external_import_id',
         'sent_at',
         'status',
-        'offers_count',
+        'total_offers',
+        'processed_offers',
         'error_message'
     ];
 
